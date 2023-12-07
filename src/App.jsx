@@ -1,115 +1,154 @@
 // import FormCreateTodo from './components/Forms/FormCreateUser'
-import Header from './components/Header/Header'
+import Header from "./components/Header/Header";
 // import Counter from './components/Counter/Counter'
-import Modal from './components/Modal/Modal'
-import { Component } from 'react'
-import FormCreateTodo from './components/Forms/FormCreateTodo'
-import TodoList from './components/TodoList'
-import data from './data.json'
-import { nanoid } from 'nanoid'
+import Modal from "./components/Modal/Modal";
+import { Component } from "react";
+import FormCreateTodo from "./components/Forms/FormCreateTodo";
+import TodoList from "./components/TodoList";
+import data from "./data.json";
+import { nanoid } from "nanoid";
 
 class App extends Component {
-	state = {
-		isShowModal: false,
-		todo: null,
-		isDeleted: false,
-		isCreated: false,
-	}
+  state = {
+    isShowModal: false,
+    todo: data,
+    // isDeleted: false,
+    // isCreated: false,
+  };
 
-	componentDidMount() {
-		const localData = localStorage.getItem('todo')
-		if (localData && JSON.parse(localData).length > 0) {
-			this.setState({
-				todo: JSON.parse(localData),
-			})
-		} else
-			this.setState({
-				todo: data,
-			})
-	}
+  componentDidMount() {
+    const localData = localStorage.getItem("todo");
+    if (localData && JSON.parse(localData).length > 0) {
+      this.setState({
+        todo: JSON.parse(localData),
+      });
+    }
+  }
+//   componentDidUpdate(prevProps, prevState) {
+//     if (prevState.todo.length !== this.state.todo.length)
+//       localStorage.setItem("todo", JSON.stringify(this.state.todo));
+  }
+  componentWillUnmount() {
+    console.log("Unmount");
+  }
 
-	componentDidUpdate(prevProps, prevState) {
-		if (prevState.todo?.length !== this.state.todo.length)
-			localStorage.setItem('todo', JSON.stringify(this.state.todo))
+  //   componentDidMount() {
+  //     const localData = localStorage.getItem("todo");
+  //     if (localData && JSON.parse(localData).length > 0) {
+  //       this.setState({
+  //         todo: JSON.parse(localData),
+  //       });
+  //     } else
+  //       this.setState({
+  //         todo: data,
+  //       });
+  //   }
 
-		if (prevState.todo?.length > this.state.todo.length) {
-			this.setState({ isDeleted: true })
-			setTimeout(() => {
-				this.setState({ isDeleted: false })
-			}, 1500)
-		}
+    componentDidUpdate(prevProps, prevState) {
+      if (prevState.todo?.length !== this.state.todo.length)
+        localStorage.setItem("todo", JSON.stringify(this.state.todo));
 
-		if (prevState.todo?.length < this.state.todo.length) {
-			this.setState({ isCreated: true })
-			setTimeout(() => {
-				this.setState({ isCreated: false })
-			}, 1500)
-		}
-	}
+      if (prevState.todo?.length > this.state.todo.length) {
+        this.setState({ isDeleted: true });
+        setTimeout(() => {
+          this.setState({ isDeleted: false });
+        }, 1500);
+      }
 
-	toggleModal = () => {
-		this.setState((prev) => ({
-			isShowModal: !prev.isShowModal,
-		}))
-	}
+      if (prevState.todo?.length < this.state.todo.length) {
+        this.setState({ isCreated: true });
+        setTimeout(() => {
+          this.setState({ isCreated: false });
+        }, 1500);
+      }
+    }
 
-	createTodo = (data) => {
-		const newTodo = {
-			...data,
-			id: nanoid(),
-			completed: false,
-		}
-		const isDuplicated = this.state.todo.find((el) => el.title === data.title)
-		if (isDuplicated) return
-		this.setState((prev) => ({
-			todo: [...prev.todo, newTodo],
-		}))
-	}
+  toggleModal = () => {
+    this.setState((prev) => ({
+      isShowModal: !prev.isShowModal,
+    }));
+  };
+  //   createTodo = (newTodo) => {
+  //     // Перевірка, чи this.state.todos не є null перед викликом методу find
+  //     if (this.state.todos) {
+  //       const existingTodo = this.state.todos.find(
+  //         (todo) => todo.text === newTodo.text
+  //       );
 
-	deleteTodo = (id) => {
-		this.setState((prev) => ({
-			todo: prev.todo.filter((el) => el.id !== id),
-		}))
-	}
+  //       if (existingTodo) {
+  //         // Якщо todo вже існує, зробіть потрібні дії
+  //         // ...
+  //       } else {
+  //         // Якщо todo не існує, додайте його до стану
+  //         this.setState((prevState) => ({
+  //           todos: [...prevState.todos, newTodo],
+  //         }));
+  //       }
+  //     }
+  //   };
+  createTodo = (data) => {
+    const newTodo = {
+      ...data,
+      id: nanoid(),
+      completed: false,
+    };
+    const isDuplicated = this.state.todo.find((el) => el.title === data.title);
+    if (isDuplicated) return;
+    this.setState((prev) => ({
+      todo: [...prev.todo, newTodo],
+    }));
+  };
 
-	updateTodo = (id) => {
-		this.setState(
-			(prev) => ({
-				todo: prev.todo.map((el) => {
-					if (el.id === id) return { ...el, completed: !el.completed }
-					else return el
-				}),
-			}),
-			() => localStorage.setItem('todo', JSON.stringify(this.state.todo))
-		)
-	}
+  deleteTodo = (id) => {
+    this.setState((prev) => ({
+      todo: prev.todo.filter((el) => el.id !== id),
+    }));
+  };
 
-	render() {
-		const { isDeleted, isShowModal, todo, isCreated } = this.state
-		return (
-			<>
-				{isDeleted && (
-					<div className='alert alert-primary' role='alert'>
-						Deleted
-					</div>
-				)}
-				{isCreated && (
-					<div className='alert alert-primary' role='alert'>
-						Created
-					</div>
-				)}
-				<Header showModal={this.toggleModal} />
+  updateTodo = (id) => {
+    this.setState(
+      (prev) => ({
+        todo: prev.todo.map((el) => {
+          if (el.id === id) return { ...el, completed: !el.completed };
+          else return el;
+        }),
+      }),
+      () => localStorage.setItem("todo", JSON.stringify(this.state.todo))
+    );
+  };
 
-				{isShowModal && <Modal hideModal={this.toggleModal}>zxmczmxc</Modal>}
+  render() {
+    const { isDeleted, isShowModal, todo, isCreated } = this.state;
+    return (
+      <>
+        {isDeleted && (
+          <div className="alert alert-primary" role="alert">
+            Deleted
+          </div>
+        )}
+        {isCreated && (
+          <div className="alert alert-primary" role="alert">
+            Created
+          </div>
+        )}
+        <Header showModal={this.toggleModal} />
 
-				<FormCreateTodo createTodo={this.createTodo} />
-				{todo && <TodoList todo={todo} deleteTodo={this.deleteTodo} updateTodo={this.updateTodo} />}
-			</>
-		)
-	}
+        {isShowModal && <Modal hideModal={this.toggleModal}>zxmczmxc</Modal>}
+
+        <FormCreateTodo createTodo={this.createTodo} />
+        {todo && (
+          <TodoList
+            todo={todo}
+            deleteTodo={this.deleteTodo}
+            updateTodo={this.updateTodo}
+          />
+        )}
+      </>
+    );
+  }
 }
 
-export default App
+export default App;
 // class App extends Component {
 // 	state = {
 // 		isShowModal: false,
